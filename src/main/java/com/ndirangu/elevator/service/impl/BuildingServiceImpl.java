@@ -53,6 +53,9 @@ private final ElevatorService elevatorService;
          if none found call all
          */
 
+        for (Elevator elevator: building.getElevators()){
+            log.info("Elevator {} is currently at floor {} is {}", elevator.getName(), elevator.getFloor(), elevator.getState());
+        }
         List<Elevator> idealElevators = building.getElevators()
                 .stream()
                 .filter(elevator ->

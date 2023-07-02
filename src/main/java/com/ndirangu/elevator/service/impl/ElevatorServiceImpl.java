@@ -24,31 +24,39 @@ private final ElevatorRepository elevatorRepository;
     // at what point should we save to db
     // more logging?
     @Override
-    public Elevator move(Elevator elevator,Long requestedFloor,  Long destination) {
+    public Elevator move(Elevator elevator, Long requestedFloor, Long destination) {
 
         long distance = requestedFloor - elevator.getFloor();
 
-        if (distance == 0){
-         openDoors(elevator.getName());
-        }
-        else {
-            //move to requested floor & open doors
+        if (distance == 0) {
+            openDoors(elevator.getName());
+        } else {
+            // move to requested floor & open doors
             Long start = elevator.getFloor();
             elevator.setIsMoving(true);
             startCounting(start, distance, elevator, requestedFloor);
             openDoors(elevator.getName());
+
+            // Delay before moving to the destination
+            try {
+                Thread.sleep(5000); // Adjust the delay as needed
+            } catch (InterruptedException e) {
+                log.error("Thread interrupted while waiting for the first move to complete.", e);
+            }
         }
 
-        //move to destination
+        // move to destination
         Long distanceToDestination = destination - requestedFloor;
         elevator.setIsMoving(true);
         startCounting(requestedFloor, distanceToDestination, elevator, destination);
         openDoors(elevator.getName());
+
         elevator.setIsMoving(false);
         elevator.setState(STATIONARY);
 
         return elevatorRepository.save(elevator);
     }
+
 
 
     //todo: improve impl
@@ -76,35 +84,44 @@ private final ElevatorRepository elevatorRepository;
 
     //todo: improve impl
     private void startCounting(Long start, Long distance, Elevator elevator, Long destination) {
-
         Timer timer = new Timer();
+        String state;
 
-        if (distance > 0){
-            elevator.setState(ASC);
-        }else {
-            elevator.setState(DESC);
+        if (distance > 0) {
+            state = ASC;
+            elevator.setState(state);
+        } else {
+            state = DESC;
+            elevator.setState(state);
         }
+
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-               elevator.setFloor(start + direction(distance));
+                Long temp = start;
 
-               log.info("Elevator {} is currently at floor {} moving {}", elevator.getName(), elevator.getFloor(), elevator.getState());
+                if (isPositive(distance)) {
+                    temp++;
+                } else {
+                    temp--;
+                }
 
-               if (Objects.equals(elevator.getFloor(), destination)){
-                   timer.cancel();
-               }
+                elevator.setFloor(temp);
+
+                log.info("Elevator {} is currently at floor {} is {}", elevator.getName(), temp, state);
+
+                if (Objects.equals(elevator.getFloor(), destination)) {
+                    timer.cancel();
+                    openDoors(elevator.getName());
+                }
             }
         };
 
         timer.schedule(task, 0, 5000);
     }
 
-    private int direction( Long distance){
-        if (distance > 0){
-            return 1;
-        }else {
-            return -1;
-        }
+
+    private boolean isPositive( Long distance){
+        return distance >0;
     }
 }
