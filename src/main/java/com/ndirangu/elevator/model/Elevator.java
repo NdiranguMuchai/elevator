@@ -13,5 +13,6 @@ public class Elevator {
     private String name;
     private Long floor;
     private Boolean isMoving = false;
+    private String state = "stationary";
 
 }

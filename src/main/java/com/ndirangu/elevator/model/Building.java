@@ -16,4 +16,6 @@ public class Building {
     @OneToMany
     private List<Elevator> elevators = new ArrayList<>();
 
+    private Long highestFloor;
+    private Long lowestFloor;
 }

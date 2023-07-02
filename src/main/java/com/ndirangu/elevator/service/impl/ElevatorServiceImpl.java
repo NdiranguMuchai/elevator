@@ -15,6 +15,10 @@ import java.util.TimerTask;
 @Slf4j
 @AllArgsConstructor
 public class ElevatorServiceImpl implements ElevatorService {
+    static final String STATIONARY = "stationary";
+    static final String ASC = "ascending";
+    static final String DESC = "descending";
+
 private final ElevatorRepository elevatorRepository;
     //can it handle more than 1 person requesting
     // at what point should we save to db
@@ -40,6 +44,8 @@ private final ElevatorRepository elevatorRepository;
         elevator.setIsMoving(true);
         startCounting(requestedFloor, distanceToDestination, elevator, destination);
         openDoors(elevator.getName());
+        elevator.setIsMoving(false);
+        elevator.setState(STATIONARY);
 
         return elevatorRepository.save(elevator);
     }
@@ -72,19 +78,18 @@ private final ElevatorRepository elevatorRepository;
     private void startCounting(Long start, Long distance, Elevator elevator, Long destination) {
 
         Timer timer = new Timer();
-        String direction;
 
         if (distance > 0){
-            direction = "UP";
+            elevator.setState(ASC);
         }else {
-            direction = "DOWN";
+            elevator.setState(DESC);
         }
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
                elevator.setFloor(start + direction(distance));
 
-               log.info("Elevator {} is currently at floor {} moving {}", elevator.getName(), elevator.getFloor(), direction);
+               log.info("Elevator {} is currently at floor {} moving {}", elevator.getName(), elevator.getFloor(), elevator.getState());
 
                if (Objects.equals(elevator.getFloor(), destination)){
                    timer.cancel();
