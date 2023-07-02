@@ -5,4 +5,5 @@ import com.ndirangu.elevator.model.Building;
 
 public interface BuildingService {
     Building requestElevator(ElevatorRequestDto request) throws Exception;
+    Building findById(Long id)throws Exception;
 }

@@ -73,4 +73,8 @@ private final ElevatorService elevatorService;
     }
 
 
+    @Override
+    public Building findById(Long id) throws Exception {
+       return buildingRepository.findById(id).orElseThrow(() -> new Exception("We do not recognise the building"));
+    }
 }
