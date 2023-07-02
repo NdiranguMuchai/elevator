@@ -5,6 +5,8 @@ import com.ndirangu.elevator.repository.ElevatorRepository;
 import com.ndirangu.elevator.service.ElevatorService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -124,4 +126,20 @@ private final ElevatorRepository elevatorRepository;
     private boolean isPositive( Long distance){
         return distance >0;
     }
+
+    @Override
+    public Page<Elevator> findAll(Pageable pageable) {
+        return elevatorRepository.findAll(pageable);
+    }
+
+    @Override
+    public Elevator findOne(Long id)  throws Exception{
+        return elevatorRepository.findById(id).orElseThrow(() -> new Exception("Elevator not found"));
+    }
+
+    @Override
+    public Elevator createOrUpdate(Elevator elevator) {
+        return elevatorRepository.save(elevator);
+    }
+
 }

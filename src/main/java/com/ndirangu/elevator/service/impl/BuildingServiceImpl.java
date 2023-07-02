@@ -8,6 +8,8 @@ import com.ndirangu.elevator.service.BuildingService;
 import com.ndirangu.elevator.service.ElevatorService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,5 +81,20 @@ private final ElevatorService elevatorService;
     @Override
     public Building findById(Long id) throws Exception {
        return buildingRepository.findById(id).orElseThrow(() -> new Exception("We do not recognise the building"));
+    }
+
+    @Override
+    public Building create(Building building) {
+        return buildingRepository.save(building);
+    }
+
+    @Override
+    public Page<Building> findAll(Pageable pageable) {
+        return buildingRepository.findAll(pageable);
+    }
+
+    @Override
+    public Building update(Building building) {
+        return buildingRepository.save(building);
     }
 }
